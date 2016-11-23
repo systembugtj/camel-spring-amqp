@@ -171,12 +171,12 @@ public class SpringAMQPConsumerTest extends CamelTestSupport {
         mockEndpoint.assertIsSatisfied();
 
         Message inMessage1 = mockEndpoint.getExchanges().get(0).getIn();
-        Assert.assertEquals("sendMessage1", inMessage1.getBody(String.class));
-        Assert.assertEquals("HeaderValue", inMessage1.getHeader("HeaderKey"));
+        assertEquals("sendMessage1", inMessage1.getBody(String.class));
+        assertEquals("HeaderValue", inMessage1.getHeader("HeaderKey"));
 
         Message inMessage2 = mockEndpoint.getExchanges().get(1).getIn();
-        Assert.assertEquals("sendMessage2", inMessage2.getBody(String.class));
-        Assert.assertEquals("HeaderValue", inMessage2.getHeader("HeaderKey"));
+        assertEquals("sendMessage2", inMessage2.getBody(String.class));
+        assertEquals("HeaderValue", inMessage2.getHeader("HeaderKey"));
 
     }
 

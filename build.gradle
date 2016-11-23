@@ -1,0 +1,109 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.4.7"
+    }
+}
+
+def repoContextUrl = hasProperty("artifactory_context_url") ? artifactory_context_url : System.getenv('artifactory_context_url')
+def repoUsername = hasProperty("artifactory_username") ? artifactory_username : System.getenv('artifactory_username')
+def repoPassword = hasProperty("artifactory_password") ? artifactory_password : System.getenv('artifactory_password')
+def repoPath = hasProperty("artifactory_key") ? artifactory_key : System.getenv('artifactory_key')
+
+
+def VERSION_CODE = '1.8.0'
+def VERSION_NAME = System.getenv("AUTO_BUILD_NUMBER") ? "$VERSION_CODE-SNAPSHOT" : VERSION_CODE
+
+
+apply plugin: 'java'
+apply plugin: "idea"
+apply plugin: 'maven'
+apply plugin: 'maven-publish'
+apply plugin: "com.jfrog.artifactory"
+
+group = 'com.conouch.camel'
+version = VERSION_CODE
+
+description = "Camel::Spring-AMQP"
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+tasks.withType(JavaCompile) {
+	options.encoding = 'UTF-8'
+}
+
+repositories {
+    mavenCentral()
+    jcenter()
+    maven { url "https://repository.apache.org/content/repositories/releases" }
+    maven { url "http://repo.maven.apache.org/maven2" }
+    maven { url "http://repo.spring.io/libs-snapshot-local" }
+    maven { url "http://repo.spring.io/libs-release-local" }
+
+    maven {
+        url "${repoContextUrl}/libs-release-local"
+        credentials {
+            username = repoUsername
+            password = repoPassword
+        }
+    }
+}
+
+dependencies {
+    final CAMEL_VERSION = '2.18.0'
+    final SPRING_VERSION = '4.3.4.RELEASE'
+    final SPRING_AMQP_VERSION = '1.6.5.RELEASE'
+
+    // https://mvnrepository.com/artifact/org.apache.camel/camel-core
+    compile group: 'org.apache.camel', name: 'camel-core', version: '2.18.0'
+
+    compile group: 'com.thoughtworks.xstream', name: 'xstream', version:'1.4.7'
+    compile group: 'org.codehaus.jettison', name: 'jettison', version:'1.3.7'
+    compile group: 'org.codehaus.jackson', name: 'jackson-mapper-asl', version:'1.9.13'
+
+    compile group: 'org.springframework.retry', name: 'spring-retry', version:'1.1.5.RELEASE'
+    compile "org.springframework.amqp:spring-amqp:$SPRING_AMQP_VERSION"
+    compile "org.springframework.amqp:spring-rabbit:$SPRING_AMQP_VERSION"
+
+    compile "org.springframework:spring-core:$SPRING_VERSION"
+    compile "org.springframework:spring-beans:$SPRING_VERSION"
+    compile "org.springframework:spring-context:$SPRING_VERSION"
+
+    testCompile group: 'ch.qos.logback', name: 'logback-core', version:'1.1.2'
+    testCompile group: 'ch.qos.logback', name: 'logback-classic', version:'1.1.2'
+    testCompile group: 'org.apache.camel', name: 'camel-test', version: '2.18.0'
+    testCompile(group: 'org.apache.camel', name: 'camel-spring', version: '2.18.0') {
+        exclude(module: 'spring-tx')
+        exclude(module: 'spring-context')
+    }
+    testCompile group: 'org.apache.camel', name: 'camel-xstream', version: '2.18.0'
+    testCompile "org.springframework:spring-test:$SPRING_VERSION"
+    testCompile group: 'org.hamcrest', name: 'hamcrest-library', version: '1.3'
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testCompile group: 'org.mockito', name: 'mockito-all', version: '1.10.12'
+}
+
+artifactory {
+    contextUrl = repoContextUrl
+    publish {
+        repository {
+            repoKey = repoPath
+            username = repoUsername
+            password = repoPassword
+            maven = true
+        }
+        defaults {
+            publications('mavenJava')
+        }
+    }
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+}
