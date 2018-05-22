@@ -18,7 +18,7 @@ import org.springframework.amqp.support.converter.MessageConverter;
 public class SpringAMQPMessageTest {
     @Test
     public void testExchangePattern() throws Exception {
-        org.apache.camel.Message camelMessage = new DefaultMessage();
+        org.apache.camel.Message camelMessage = new DefaultMessage(new DefaultCamelContext());
         Exchange exchange = new DefaultExchange(new DefaultCamelContext(), ExchangePattern.InOut);
         exchange.setIn(camelMessage);
         
@@ -47,7 +47,7 @@ public class SpringAMQPMessageTest {
     public void toAMQP() throws Exception {
         MessageConverter msgConverter = new StringMessageConverter();
         
-        SpringAMQPMessage camelMessage = new SpringAMQPMessage();
+        SpringAMQPMessage camelMessage = new SpringAMQPMessage(new DefaultCamelContext());
         camelMessage.setBody("Test Message 2");
         camelMessage.setHeader("Secret", "My Secret");
         

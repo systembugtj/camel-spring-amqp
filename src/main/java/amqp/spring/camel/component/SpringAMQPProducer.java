@@ -7,6 +7,7 @@ package amqp.spring.camel.component;
 import org.apache.camel.AsyncCallback;
 import org.apache.camel.Exchange;
 import org.apache.camel.impl.DefaultAsyncProducer;
+import org.apache.camel.impl.DefaultCamelContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.AmqpConnectException;
@@ -125,7 +126,7 @@ public class SpringAMQPProducer extends DefaultAsyncProducer {
         @Override
         public void run() {
             org.apache.camel.Message message = exchange.getIn();
-            SpringAMQPMessage inMessage = new SpringAMQPMessage(message);
+            SpringAMQPMessage inMessage = new SpringAMQPMessage(new DefaultCamelContext(), message);
             exchange.setIn(inMessage); //Swap out the old message format
 
             MessageConverter msgConverter;

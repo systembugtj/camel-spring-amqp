@@ -12,7 +12,7 @@ import org.apache.camel.test.junit4.CamelTestSupport;
 import org.junit.Test;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.amqp.support.converter.JsonMessageConverter;
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,7 +23,7 @@ public class SpringAMQPConsumerTest extends CamelTestSupport {
     @Test
     public void testCreateContext() throws Exception {
         Component component = context().getComponent("spring-amqp", SpringAMQPComponent.class);
-        Assert.assertNotNull(component);
+        assertNotNull(component);
     }
     
     @Test 
@@ -145,15 +145,15 @@ public class SpringAMQPConsumerTest extends CamelTestSupport {
         
         mockEndpoint.assertIsSatisfied();
         Message inMessage = mockEndpoint.getExchanges().get(0).getIn();
-        Assert.assertEquals("sendMessage", inMessage.getBody(String.class));
-        Assert.assertEquals("HeaderValue", inMessage.getHeader("HeaderKey"));
+        assertEquals("sendMessage", inMessage.getBody(String.class));
+        assertEquals("HeaderValue", inMessage.getHeader("HeaderKey"));
     }
 
     @Test
     public void testHandleException() {
         try {
             Object result = context().createProducerTemplate().requestBody("spring-amqp::test.f", "testBody");
-            Assert.fail("Should have thrown exception up to caller but received object: " + result);
+            fail("Should have thrown exception up to caller but received object: " + result);
         } catch (RuntimeException e) {
             // success
         }
@@ -192,7 +192,7 @@ public class SpringAMQPConsumerTest extends CamelTestSupport {
         CachingConnectionFactory factory = new CachingConnectionFactory();
         RabbitTemplate amqpTemplate = new RabbitTemplate(factory);
         //The JSON converter stresses marshalling more than the default converter
-        amqpTemplate.setMessageConverter(new JsonMessageConverter());
+        amqpTemplate.setMessageConverter(new Jackson2JsonMessageConverter());
         SpringAMQPComponent amqpComponent = new SpringAMQPComponent(factory);
         amqpComponent.setAmqpTemplate(amqpTemplate);
         

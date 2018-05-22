@@ -20,7 +20,7 @@ public class SpringAMQPHeaderTest {
         message.getMessageProperties().setPriority(1);
         message.getMessageProperties().setReplyTo("BuzzSaw");
         
-        SpringAMQPMessage camelMessage = SpringAMQPHeader.setBasicPropertiesToHeaders(new SpringAMQPMessage(), message);
+        SpringAMQPMessage camelMessage = SpringAMQPHeader.setBasicPropertiesToHeaders(new SpringAMQPMessage(new DefaultCamelContext()), message);
         Assert.assertNull(camelMessage.getHeader("NotSecret"));
         Assert.assertEquals(1, camelMessage.getHeader(SpringAMQPHeader.PRIORITY));
         Assert.assertEquals("BuzzSaw", camelMessage.getHeader(SpringAMQPHeader.REPLY_TO));
@@ -28,7 +28,7 @@ public class SpringAMQPHeaderTest {
     
     @Test
     public void toBasicProperties() throws Exception {
-        SpringAMQPMessage camelMessage = new SpringAMQPMessage();
+        SpringAMQPMessage camelMessage = new SpringAMQPMessage(new DefaultCamelContext());
         camelMessage.setHeader("Secret", "My Secret");
         camelMessage.setHeader(SpringAMQPHeader.PRIORITY, 1);
         camelMessage.setHeader(SpringAMQPHeader.REPLY_TO, "BuzzSaw");
@@ -50,14 +50,14 @@ public class SpringAMQPHeaderTest {
         org.springframework.amqp.core.Message message = new Message(new byte[]{}, properties);
         message.getMessageProperties().setReplyTo("BuzzSaw");
         
-        SpringAMQPMessage camelMessage = SpringAMQPHeader.copyHeaders(new SpringAMQPMessage(), message.getMessageProperties().getHeaders());
+        SpringAMQPMessage camelMessage = SpringAMQPHeader.copyHeaders(new SpringAMQPMessage(new DefaultCamelContext()), message.getMessageProperties().getHeaders());
         Assert.assertEquals("Popcorn", camelMessage.getHeader("NotSecret"));
         Assert.assertNull(camelMessage.getHeader(SpringAMQPHeader.REPLY_TO));
     }
     
     @Test
     public void copyCamelHeaders() throws Exception {
-        SpringAMQPMessage camelMessage = new SpringAMQPMessage();
+        SpringAMQPMessage camelMessage = new SpringAMQPMessage(new DefaultCamelContext());
         camelMessage.setHeader("Secret", "My Secret");
         camelMessage.setHeader(SpringAMQPHeader.REPLY_TO, "BuzzSaw");
         

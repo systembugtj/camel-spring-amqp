@@ -38,8 +38,7 @@ public class SpringAMQPHeader {
             } else if(MESSAGE_ID.equals(headerKey)) {
                 msg.getMessageProperties().setMessageId(headerValueString);
             } else if(CORRELATION_ID.equals(headerKey)) {
-                byte[] correlationId = headerValueString != null ? headerValueString.getBytes() : null;
-                msg.getMessageProperties().setCorrelationId(correlationId);
+                msg.getMessageProperties().setCorrelationId(headerValueString);
             } else if(EXPIRATION.equals(headerKey)) {
                 msg.getMessageProperties().setExpiration(headerValueString);
             } else if(PRIORITY.equals(headerKey)) {
@@ -59,8 +58,8 @@ public class SpringAMQPHeader {
     
     public static SpringAMQPMessage setBasicPropertiesToHeaders(SpringAMQPMessage msg, Message amqpMessage) {
         msg.getHeaders().put(MESSAGE_ID, amqpMessage.getMessageProperties().getMessageId());
-        byte[] correlationId = amqpMessage.getMessageProperties().getCorrelationId();
-        msg.getHeaders().put(CORRELATION_ID, correlationId == null ? null : new String(correlationId));
+        String correlationId = amqpMessage.getMessageProperties().getCorrelationId();
+        msg.getHeaders().put(CORRELATION_ID, correlationId);
         msg.getHeaders().put(CONTENT_ENCODING, amqpMessage.getMessageProperties().getContentEncoding());
         msg.getHeaders().put(CONTENT_TYPE, amqpMessage.getMessageProperties().getContentType());
         msg.getHeaders().put(EXPIRATION, amqpMessage.getMessageProperties().getExpiration());

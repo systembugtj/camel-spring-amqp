@@ -9,6 +9,7 @@ import org.aopalliance.aop.Advice;
 import org.apache.camel.Exchange;
 import org.apache.camel.ExchangePattern;
 import org.apache.camel.Processor;
+import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.impl.DefaultConsumer;
 import org.apache.camel.impl.DefaultExchange;
 import org.slf4j.Logger;
@@ -200,10 +201,14 @@ public class SpringAMQPConsumer extends DefaultConsumer implements ConnectionLis
             try {
                 getProcessor().process(exchange);
 
-                if (endpoint.getAcknowledgeMode() == AcknowledgeMode.MANUAL) {
-                    long deliveryTag = amqpMessage.getMessageProperties().getDeliveryTag();
-                    LOG.trace("Acknowledging receipt [delivery_tag={}]", deliveryTag);
-                    channel.basicAck(deliveryTag, false);
+                // Camel already set the exception here.
+                // If exchagen has exception, should not process.
+                if (exchange.getException() == null) {
+                    if (endpoint.getAcknowledgeMode() == AcknowledgeMode.MANUAL) {
+                        long deliveryTag = amqpMessage.getMessageProperties().getDeliveryTag();
+                        LOG.trace("Acknowledging receipt [delivery_tag={}]", deliveryTag);
+                        channel.basicAck(deliveryTag, false);
+                    }
                 }
             } catch(Throwable t) {
                 exchange.setException(t);
@@ -213,7 +218,7 @@ public class SpringAMQPConsumer extends DefaultConsumer implements ConnectionLis
             Address replyToAddress = amqpMessage.getMessageProperties().getReplyToAddress();
             if(replyToAddress != null && endpoint.isAutoReply()) {
                 org.apache.camel.Message outMessage = exchange.getOut();
-                SpringAMQPMessage replyMessage = new SpringAMQPMessage(outMessage);
+                SpringAMQPMessage replyMessage = new SpringAMQPMessage(new DefaultCamelContext(), outMessage);
 
                 // Camel exchange will contain a non-null exception if an unhandled exception has occurred,
                 // such as when using the DefaultErrorHandler with default configuration, or when
