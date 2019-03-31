@@ -22,22 +22,22 @@ public class SpringAMQPMessage extends DefaultMessage {
     public static final String EXCHANGE_PATTERN = "CamelExchangePattern";
     public static final String IS_EXCEPTION_CAUGHT = "IsCamelExceptionCaught";
 
-    public SpringAMQPMessage(DefaultCamelContext camelContext) {
+    public SpringAMQPMessage(CamelContext camelContext) {
         super(camelContext);
     }
 
-    public SpringAMQPMessage(DefaultCamelContext camelContext, org.apache.camel.Message source) {
+    public SpringAMQPMessage(CamelContext camelContext, org.apache.camel.Message source) {
         super(camelContext);
         if(source != null) copyFrom(source);
     }
 
-    public static SpringAMQPMessage fromAMQPMessage(MessageConverter msgConverter, org.springframework.amqp.core.Message amqpMessage) {
+    public static SpringAMQPMessage fromAMQPMessage(CamelContext camelContext, MessageConverter msgConverter, org.springframework.amqp.core.Message amqpMessage) {
         if(amqpMessage == null) {
             LOG.debug("Received NULL AMQP Message, returning null");
             return null;
         }
         
-        SpringAMQPMessage message = new SpringAMQPMessage(new DefaultCamelContext());
+        SpringAMQPMessage message = new SpringAMQPMessage(camelContext);
         
         //Restore the body based on the message converter provided
         if(amqpMessage.getBody() == null || amqpMessage.getBody().length == 0) {

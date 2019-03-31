@@ -3,13 +3,14 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 package amqp.spring.camel.component;
 
-import junit.framework.Assert;
 import org.apache.camel.*;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.impl.JndiRegistry;
 import org.apache.camel.test.junit4.CamelTestSupport;
+import org.junit.Assert;
 import org.junit.Test;
+import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
@@ -194,7 +195,7 @@ public class SpringAMQPConsumerTest extends CamelTestSupport {
         //The JSON converter stresses marshalling more than the default converter
         amqpTemplate.setMessageConverter(new Jackson2JsonMessageConverter());
         SpringAMQPComponent amqpComponent = new SpringAMQPComponent(factory);
-        amqpComponent.setAmqpTemplate(amqpTemplate);
+        amqpComponent.setAmqpTemplate( new HashMap<String, AmqpTemplate>(1));
         
         CamelContext camelContext = super.createCamelContext();
         camelContext.addComponent("spring-amqp", amqpComponent);
@@ -213,7 +214,7 @@ public class SpringAMQPConsumerTest extends CamelTestSupport {
                 from("spring-amqp:headerAndExchange:q3:cheese=gouda&fromage=jack?type=headers&durable=false&autodelete=true&exclusive=false").to("mock:test.c");
                 from("spring-amqp:headerOrExchange:q4:cheese=white|fromage=bleu?type=headers&durable=false&autodelete=true&exclusive=false").to("mock:test.d");
                 from("spring-amqp::test.e:test.e?durable=false&autodelete=true&exclusive=false").to("mock:test.e");
-                from("spring-amqp::test.f:test.f?durable=false&autodelete=true&exclusive=false").beanRef("exceptionThrower", "explode");
+                from("spring-amqp::test.f:test.f?durable=false&autodelete=true&exclusive=false").bean("exceptionThrower", "explode");
             }
         };
     }

@@ -126,7 +126,7 @@ public class SpringAMQPProducer extends DefaultAsyncProducer {
         @Override
         public void run() {
             org.apache.camel.Message message = exchange.getIn();
-            SpringAMQPMessage inMessage = new SpringAMQPMessage(new DefaultCamelContext(), message);
+            SpringAMQPMessage inMessage = new SpringAMQPMessage(endpoint.getCamelContext(), message);
             exchange.setIn(inMessage); //Swap out the old message format
 
             MessageConverter msgConverter;
@@ -148,7 +148,7 @@ public class SpringAMQPProducer extends DefaultAsyncProducer {
                 if(exchange.getPattern().isOutCapable()) {
                     LOG.debug("Synchronous send and request for exchange {}", exchange.getExchangeId());
                     Message amqpResponse = endpoint.getAmqpTemplate().sendAndReceive(exchangeName, routingKey, inMessage.toAMQPMessage(msgConverter));
-                    SpringAMQPMessage camelResponse = SpringAMQPMessage.fromAMQPMessage(msgConverter, amqpResponse);
+                    SpringAMQPMessage camelResponse = SpringAMQPMessage.fromAMQPMessage(endpoint.getCamelContext(), msgConverter, amqpResponse);
 
                     Boolean isExceptionCaught = camelResponse != null && (Boolean)camelResponse.getHeader(SpringAMQPMessage.IS_EXCEPTION_CAUGHT, Boolean.FALSE);
                     if (isExceptionCaught != null && isExceptionCaught.equals(Boolean.TRUE)) {

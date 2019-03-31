@@ -36,11 +36,11 @@ tasks.withType(JavaCompile) {
 repositories {
     mavenCentral()
     jcenter()
+    maven { url "https://repository.apache.org/content/repositories/snapshots" }
     maven { url "https://repository.apache.org/content/repositories/releases" }
     maven { url "http://repo.maven.apache.org/maven2" }
     maven { url "http://repo.spring.io/libs-snapshot-local" }
     maven { url "http://repo.spring.io/libs-release-local" }
-
     maven {
         url "${repoContextUrl}/libs-release-local"
         credentials {
@@ -51,7 +51,7 @@ repositories {
 }
 
 dependencies {
-    final CAMEL_VERSION = '2.21.1'
+    final CAMEL_VERSION = '2.22.0-SNAPSHOT'
     final SPRING_VERSION = '5.0.6.RELEASE'
     final SPRING_AMQP_VERSION = '2.0.3.RELEASE'
 
@@ -63,15 +63,10 @@ dependencies {
     compile group: 'org.codehaus.jackson', name: 'jackson-mapper-asl', version:'1.9.13'
 
     compile "org.springframework.retry:spring-retry:1.2.2.RELEASE"
-    compile "org.springframework.amqp:spring-amqp:$SPRING_AMQP_VERSION"
     compile "org.springframework.amqp:spring-rabbit:$SPRING_AMQP_VERSION"
 
-    compile "org.springframework:spring-core:$SPRING_VERSION"
-    compile "org.springframework:spring-beans:$SPRING_VERSION"
-    compile "org.springframework:spring-context:$SPRING_VERSION"
-
-    testCompile group: 'ch.qos.logback', name: 'logback-core', version:'1.1.2'
-    testCompile group: 'ch.qos.logback', name: 'logback-classic', version:'1.1.2'
+    testCompile group: 'ch.qos.logback', name: 'logback-core', version:'1.2.3'
+    testCompile group: 'ch.qos.logback', name: 'logback-classic', version:'1.2.3'
     testCompile "org.apache.camel:camel-test:$CAMEL_VERSION"
     testCompile("org.apache.camel:camel-spring:$CAMEL_VERSION") {
         exclude(module: 'spring-tx')

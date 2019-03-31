@@ -38,7 +38,7 @@ public class SpringAMQPMessageTest {
         properties.setHeader("NotSecret", "Popcorn");
         org.springframework.amqp.core.Message message = new org.springframework.amqp.core.Message(body.getBytes(), properties);
         
-        SpringAMQPMessage camelMessage = SpringAMQPMessage.fromAMQPMessage(msgConverter, message);
+        SpringAMQPMessage camelMessage = SpringAMQPMessage.fromAMQPMessage(new DefaultCamelContext(), msgConverter, message);
         Assert.assertEquals(body, camelMessage.getBody(String.class));
         Assert.assertEquals("Popcorn", camelMessage.getHeader("NotSecret"));
     }
